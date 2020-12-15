@@ -105,6 +105,26 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
+router.get('/:student/:subject', async (req, res, next) => {
+  try {
+    const data = await dataReader();
+    const { student, subject } = req.params;
+
+    const studentGradesBySubject = data.grades.filter(
+      (grade) => grade.subject === subject && grade.student === student
+    );
+
+    const somaNotas = studentGradesBySubject.reduce(
+      (acc, curr) => acc + curr.value,
+      0
+    );
+
+    res.send({ soma: somaNotas });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.use((err, req, res, next) => {
   logger.error(`${req.method} ${req.baseUrl} - ${err.message}`);
   res.status(400).send({ error: err.message });
