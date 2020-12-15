@@ -68,6 +68,26 @@ router.put('/:id', async (req, res, next) => {
   }
 });
 
+router.delete('/:id', async (req, res, next) => {
+  try {
+    const data = await dataReader();
+    const id = req.params.id;
+    const gradeToDelete = getGradeById(data, id);
+
+    if (gradeToDelete == null) {
+      throw new Error('Id not Found');
+    }
+
+    data.grades = data.grades.filter((grade) => grade.id !== parseInt(id));
+    await dataWriter(data);
+    logger.info(`DELETE /grade - ${JSON.stringify(gradeToDelete)}`);
+
+    res.send(gradeToDelete);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.use((err, req, res, next) => {
   logger.error(`${req.method} ${req.baseUrl} - ${err.message}`);
   res.status(400).send({ error: err.message });
