@@ -105,7 +105,7 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
-router.get('/:student/:subject', async (req, res, next) => {
+router.get('/sum/:student/:subject/', async (req, res, next) => {
   try {
     const data = await dataReader();
     const { student, subject } = req.params;
@@ -120,6 +120,28 @@ router.get('/:student/:subject', async (req, res, next) => {
     );
 
     res.send({ soma: somaNotas });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/avg/:subject/:type', async (req, res, next) => {
+  try {
+    const data = await dataReader();
+    const { subject, type } = req.params;
+
+    const typeGradesBySubject = data.grades.filter(
+      (grade) => grade.subject === subject && grade.type === type
+    );
+
+    const somaNotas = typeGradesBySubject.reduce(
+      (acc, curr) => acc + curr.value,
+      0
+    );
+
+    const quantity = Object.keys(typeGradesBySubject).length;
+
+    res.send({ media: somaNotas / quantity });
   } catch (error) {
     next(error);
   }
