@@ -6,6 +6,8 @@ import gradesRouter from './routes/grades.js';
 const { readFile, writeFile } = fs;
 
 const app = express();
+app.use(express.json());
+app.use('/grades', gradesRouter);
 
 global.fileName = 'grades.json';
 
@@ -15,6 +17,7 @@ const { combine, timestamp, label, printf } = winston.format;
 const myFormat = printf(({ level, message, label, timestamp }) => {
   return `${timestamp} [${label}] ${level}: ${message}`;
 });
+
 global.logger = winston.createLogger({
   level: 'silly',
   transports: [
@@ -28,10 +31,17 @@ global.logger = winston.createLogger({
   ),
 });
 
+//
+
 app.get('/', (req, res) => {
   res.send('Hello World');
 });
 
-app.listen(3000, () => {
-  console.log('API Started!');
+app.listen(3000, async () => {
+  try {
+    await readFile(global.fileName);
+    logger.info('API Started');
+  } catch (err) {
+    logger.error(err);
+  }
 });
