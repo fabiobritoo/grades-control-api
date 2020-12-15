@@ -147,6 +147,25 @@ router.get('/avg/:subject/:type', async (req, res, next) => {
   }
 });
 
+router.get('/top/:subject/:type', async (req, res, next) => {
+  try {
+    const data = await dataReader();
+    const { subject, type } = req.params;
+
+    let typeGradesBySubject = data.grades.filter(
+      (grade) => grade.subject === subject && grade.type === type
+    );
+
+    typeGradesBySubject = typeGradesBySubject.sort((a, b) => b.value - a.value);
+
+    let top3 = typeGradesBySubject.slice(0, 3);
+
+    res.send(top3);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.use((err, req, res, next) => {
   logger.error(`${req.method} ${req.baseUrl} - ${err.message}`);
   res.status(400).send({ error: err.message });
