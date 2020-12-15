@@ -15,21 +15,22 @@ router.get('/', (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
   try {
-    let grade = req.body;
-    const data = JSON.parse(await readFile(global.fileName));
+    const { student, subject, type, value } = req.body;
 
-    grade = {
+    const data = await dataReader();
+
+    const grade = {
       id: data.nextId++,
-      student: grade.student,
-      subject: grade.subject,
-      type: grade.type,
-      value: grade.value,
+      student: student,
+      subject: subject,
+      type: type,
+      value: value,
       timestamp: new Date(),
     };
 
     data.grades.push(grade);
 
-    await writeFile(global.fileName, JSON.stringify(data, null, 2));
+    await dataWriter(data);
 
     res.send(grade);
     logger.info(`POST /grade - ${JSON.stringify(grade)}`);
@@ -38,9 +39,54 @@ router.post('/', async (req, res, next) => {
   }
 });
 
+router.put('/:id', async (req, res, next) => {
+  try {
+    const data = await dataReader();
+    const id = req.params.id;
+    const gradeToAlter = getGradeById(data, id);
+
+    if (gradeToAlter == null) {
+      throw new Error('Id not Found');
+    }
+
+    const { student, subject, type, value } = req.body;
+
+    gradeToAlter.student = student;
+    gradeToAlter.subject = subject;
+    gradeToAlter.type = type;
+    gradeToAlter.value = value;
+
+    const index = getIndexByd(data, id);
+    data.grades[index] = gradeToAlter;
+
+    await dataWriter(data);
+    logger.info(`PUT /grade - ${JSON.stringify(gradeToAlter)}`);
+
+    res.send(gradeToAlter);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.use((err, req, res, next) => {
   logger.error(`${req.method} ${req.baseUrl} - ${err.message}`);
   res.status(400).send({ error: err.message });
 });
+
+const dataReader = async () => {
+  return JSON.parse(await readFile(global.fileName));
+};
+
+const dataWriter = async (data) => {
+  await writeFile(global.fileName, JSON.stringify(data, null, 2));
+};
+
+const getGradeById = (data, id) => {
+  return data.grades.find((grade) => grade.id === parseInt(id));
+};
+
+const getIndexByd = (data, id) => {
+  return data.grades.findIndex((grade) => (grade.id = id));
+};
 
 export default router;

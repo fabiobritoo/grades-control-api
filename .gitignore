@@ -2,3 +2,4 @@ package-lock.json
 node_modules
 requests.rest
 grades-control-api.log
+grades.json
