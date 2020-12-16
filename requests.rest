@@ -1,0 +1,57 @@
+
+@url = http://localhost:3000/grades
+
+###
+
+//POST NEW GRADE
+POST {{url}} HTTP/1.1
+content-type: application/json
+
+{
+    "student": "Roberto Achar",
+    "subject": "03 - React",
+    "type":"Fórum",
+    "value": 10
+}
+
+###
+
+//UPDATE GRADE
+PUT {{url}}/1 HTTP/1.1
+content-type: application/json
+
+{
+    
+    "value":12
+
+}
+
+###
+
+// DELETE GRADE
+DELETE {{url}}/32 HTTP/1.1
+
+###
+
+// GET GRADE BY ID
+GET {{url}}/30 HTTP/1.1
+###
+
+// SUM GRADE
+GET {{url}}/sum/{{student}}/{{subject}} HTTP/1.1
+###
+
+// AVERAGE 
+GET {{url}}/avg/{{subject}}/{{type}} HTTP/1.1
+
+###
+// TOP 3
+GET {{url}}/top/{{subject}}/{{type}} HTTP/1.1
+
+@student = Roberto Achar
+@subject = 04 - MongoDB
+@type = Trabalho Prático
+@value = 10
+
+###
+

@@ -49,20 +49,23 @@ router.put('/:id', async (req, res, next) => {
       throw new Error('Id not Found');
     }
 
-    const { student, subject, type, value } = req.body;
+    const student = req.body.student;
+    const subject = req.body.subject;
+    const type = req.body.type;
+    const value = req.body.value;
 
-    gradeToAlter.student = student;
-    gradeToAlter.subject = subject;
-    gradeToAlter.type = type;
-    gradeToAlter.value = value;
+    if (student !== undefined) gradeToAlter.student = student;
+    if (subject !== undefined) gradeToAlter.subject = subject;
+    if (type !== undefined) gradeToAlter.type = type;
+    if (value !== undefined) gradeToAlter.value = value;
 
-    const index = getIndexByd(data, id);
-    data.grades[index] = gradeToAlter;
+    // const index = getIndexByd(data, id);
+    // data.grades[index] = gradeToAlter;
+
+    res.send(data);
 
     await dataWriter(data);
     logger.info(`PUT /grade - ${JSON.stringify(gradeToAlter)}`);
-
-    res.send(gradeToAlter);
   } catch (error) {
     next(error);
   }
