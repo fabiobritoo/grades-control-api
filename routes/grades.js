@@ -1,17 +1,9 @@
 import express from 'express';
 import { promises as fs } from 'fs';
-import winston from 'winston';
-
-const currentTime = winston.format.timestamp;
 
 const { writeFile, readFile } = fs;
 
 const router = express.Router();
-
-router.get('/', (req, res, next) => {
-  res.send('Grades Route');
-  logger.info('Inside route grades');
-});
 
 router.post('/', async (req, res, next) => {
   try {
@@ -33,7 +25,6 @@ router.post('/', async (req, res, next) => {
     await dataWriter(data);
 
     res.send(grade);
-
     saveLog(req, grade);
   } catch (err) {
     next(err);
@@ -60,11 +51,8 @@ router.put('/:id', async (req, res, next) => {
     if (type !== undefined) gradeToAlter.type = type;
     if (value !== undefined) gradeToAlter.value = value;
 
-    // const index = getIndexByd(data, id);
-    // data.grades[index] = gradeToAlter;
-
     await dataWriter(data);
-    
+
     res.send(gradeToAlter);
     saveLog(req, gradeToAlter);
   } catch (error) {
@@ -104,7 +92,6 @@ router.get('/:id', async (req, res, next) => {
     }
 
     res.send(grade);
-
     saveLog(req, grade);
   } catch (error) {
     next(error);
@@ -126,8 +113,8 @@ router.get('/sum/:student/:subject/', async (req, res, next) => {
     );
 
     const soma = { soma: somaNotas };
-    res.send(soma);
 
+    res.send(soma);
     saveLog(req, soma);
   } catch (error) {
     next(error);
@@ -192,10 +179,6 @@ const dataWriter = async (data) => {
 
 const getGradeById = (data, id) => {
   return data.grades.find((grade) => grade.id === parseInt(id));
-};
-
-const getIndexByd = (data, id) => {
-  return data.grades.findIndex((grade) => (grade.id = id));
 };
 
 function saveLog(req, out) {
