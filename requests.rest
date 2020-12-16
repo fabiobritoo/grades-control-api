@@ -29,7 +29,7 @@ content-type: application/json
 ###
 
 // DELETE GRADE
-DELETE {{url}}/32 HTTP/1.1
+DELETE {{url}}/1 HTTP/1.1
 
 ###
 

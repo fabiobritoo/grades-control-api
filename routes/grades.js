@@ -33,7 +33,8 @@ router.post('/', async (req, res, next) => {
     await dataWriter(data);
 
     res.send(grade);
-    logger.info(`POST /grade - ${JSON.stringify(grade)}`);
+
+    saveLog(req, grade);
   } catch (err) {
     next(err);
   }
@@ -62,10 +63,10 @@ router.put('/:id', async (req, res, next) => {
     // const index = getIndexByd(data, id);
     // data.grades[index] = gradeToAlter;
 
-    res.send(data);
-
     await dataWriter(data);
-    logger.info(`PUT /grade - ${JSON.stringify(gradeToAlter)}`);
+    
+    res.send(gradeToAlter);
+    saveLog(req, gradeToAlter);
   } catch (error) {
     next(error);
   }
@@ -82,10 +83,11 @@ router.delete('/:id', async (req, res, next) => {
     }
 
     data.grades = data.grades.filter((grade) => grade.id !== parseInt(id));
+
     await dataWriter(data);
-    logger.info(`DELETE /grade - ${JSON.stringify(gradeToDelete)}`);
 
     res.send(gradeToDelete);
+    saveLog(req, gradeToDelete);
   } catch (error) {
     next(error);
   }
@@ -102,7 +104,8 @@ router.get('/:id', async (req, res, next) => {
     }
 
     res.send(grade);
-    logger.info(`GET /grade - ${JSON.stringify(grade)}`);
+
+    saveLog(req, grade);
   } catch (error) {
     next(error);
   }
@@ -122,7 +125,10 @@ router.get('/sum/:student/:subject/', async (req, res, next) => {
       0
     );
 
-    res.send({ soma: somaNotas });
+    const soma = { soma: somaNotas };
+    res.send(soma);
+
+    saveLog(req, soma);
   } catch (error) {
     next(error);
   }
@@ -141,10 +147,11 @@ router.get('/avg/:subject/:type', async (req, res, next) => {
       (acc, curr) => acc + curr.value,
       0
     );
-
     const quantity = Object.keys(typeGradesBySubject).length;
+    const media = { media: somaNotas / quantity };
 
-    res.send({ media: somaNotas / quantity });
+    res.send(media);
+    saveLog(req, media);
   } catch (error) {
     next(error);
   }
@@ -164,6 +171,7 @@ router.get('/top/:subject/:type', async (req, res, next) => {
     let top3 = typeGradesBySubject.slice(0, 3);
 
     res.send(top3);
+    saveLog(req, top3);
   } catch (error) {
     next(error);
   }
@@ -189,5 +197,9 @@ const getGradeById = (data, id) => {
 const getIndexByd = (data, id) => {
   return data.grades.findIndex((grade) => (grade.id = id));
 };
+
+function saveLog(req, out) {
+  logger.info(`${req.method} [${req.originalUrl}] : ${JSON.stringify(out)}`);
+}
 
 export default router;
